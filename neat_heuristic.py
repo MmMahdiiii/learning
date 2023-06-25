@@ -11,8 +11,8 @@ import time
 import json
 
 directory = os.getcwd()
-server_directory = directory + '\\PythonServer'
-client_directory = directory + '\\PythonClient'
+server_directory = directory + '/PythonServer'
+client_directory = directory + '/PythonClient'
 num_servers = 500
 
 # TODO : run num_servers servers (pop_size % num_servers == 0)
@@ -27,7 +27,7 @@ maps = []
 
 
 def init_maps():
-    maps_path = server_directory + '\\maps\\'
+    maps_path = server_directory + '/maps/'
     for filename in os.listdir(maps_path):
         maps.append('maps/' + filename)
 
@@ -48,7 +48,7 @@ def generate_servers_config(chosen_map):
         # dump the configs to server_configs folder
         config['game_handler']['map'] = chosen_map
 
-        file_path = server_directory + '\\server_configs\\' + file_name
+        file_path = server_directory + '/server_configs/' + file_name
         with open(file_path, 'w') as outfile:
             json.dump(config, outfile)
 
@@ -61,7 +61,7 @@ def run_server(_map):
     server_processes = []
     for i in range(num_servers):
         file_name = 'gamecfg' + str(i) + '.json'
-        file_path = 'server_configs\\' + file_name
+        file_path = 'server_configs/' + file_name
         server_processes.append(subprocess.Popen(['python', 'main.py', file_path]))
     return server_processes
 
@@ -77,7 +77,7 @@ def run_games(genomes, config):
     with open('gamecfg2.json', 'r') as sample_config:
         client_config = json.load(sample_config)
 
-    results = [open('client_results\\client' + str(i) + '.txt', 'w') for i in range(len(genomes))]
+    results = [open('client_results/client' + str(i) + '.txt', 'w') for i in range(len(genomes))]
     gens = []
     processes = []
     counter = 0
@@ -86,15 +86,15 @@ def run_games(genomes, config):
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         file_name = 'nn_' + str(counter) + '.pkl'
-        file_path = 'nn\\' + file_name
+        file_path = 'nn/' + file_name
         with open(file_path, 'wb') as output:
             pickle.dump(net, output, 1)
 
         # generate a config file for each client in configs folder
-        client_config_path = 'configs\\' + 'gamecfg' + str(counter) + '.json'
+        client_config_path = 'configs/' + 'gamecfg' + str(counter) + '.json'
         client_config['ai']['nn_path'] = file_path
         client_config['net']['port'] = 8000 + counter % num_servers
-        client_config['ai']['stdout'] = 'client_results\\client' + str(counter) + '.txt'
+        client_config['ai']['stdout'] = 'client_results/client' + str(counter) + '.txt'
 
         with open(client_config_path, 'w') as outfile:
             json.dump(client_config, outfile)
@@ -115,7 +115,7 @@ def run_games(genomes, config):
 
     for i, p in enumerate(processes):
         try:
-            with open('client_results\\client' + str(i) + '.txt', 'r') as f:
+            with open('client_results/client' + str(i) + '.txt', 'r') as f:
                 lines = f.readlines()
                 #           Side: Yellow
                 #           Side: Blue
@@ -173,12 +173,12 @@ def eval_genomes(genomes, config):
 
     os.chdir(directory)
     file_name = 'best_genome_' + str(gen) + '.pkl'
-    file_path = 'solutions\\' + file_name
+    file_path = 'solutions/' + file_name
     with open(file_path, 'wb') as output:
         pickle.dump(best_genome, output, 1)
     nn = neat.nn.FeedForwardNetwork.create(best_genome, config)
     file_name = 'best_nn_' + str(gen) + '.pkl'
-    file_path = 'solutions\\' + file_name
+    file_path = 'solutions/' + file_name
     with open(file_path, 'wb') as output:
         pickle.dump(nn, output, 1)
     # storing scores
